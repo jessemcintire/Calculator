@@ -1,51 +1,88 @@
-const calcDisplay = document.querySelector('.calc__display');
-let tempCalcSave = '';
-let calculationSave = '';
-const keypad = document.querySelector('.calc__keypad');
-const numButtons = Array.from(keypad.querySelectorAll('.num-button'));
-const opButtons = keypad.querySelectorAll('.op-button');
-const clearButton = keypad.querySelector('.clear-button');
-const allClearButton = keypad.querySelector('.all-clear-button');
+const calculator = document.querySelector(".calculator");
+const calcDisplay = document.querySelector(".calc__display");
+let tempCalcSave = "";
+let calculationSave = "";
+const keypad = document.querySelector(".calc__keypad");
+const numButtons = Array.from(keypad.querySelectorAll(".num-button"));
+const opButtons = keypad.querySelectorAll(".op-button");
+const clearButton = keypad.querySelector(".clear-button");
+const allClearButton = keypad.querySelector(".all-clear-button");
 
-keypad.addEventListener('click', e => {
-  if (e.target.closest('button')) {
+keypad.addEventListener("click", e => {
+  if (e.target.closest("button")) {
     const key = e.target;
     const action = key.dataset.operation;
+    const keyContent = key.textContent;
+    const displayedNum = calcDisplay.textContent;
+    const previousKeyType = calculator.dataset.previousKeyType;
+
+    Array.from(key.parentNode.children).forEach(k =>
+      k.classList.remove("is-depressed")
+    );
 
     if (!action) {
-      console.log('number key!');
+      calculator.dataset.previousKeyType = "number";
+
+      if (displayedNum === "0" || previousKeyType === "operator") {
+        calcDisplay.textContent = keyContent;
+      } else {
+        calcDisplay.textContent = displayedNum + keyContent;
+      }
+    }
+
+    if (action === "decimal") {
+      calculator.dataset.previousKeyType = "decimal";
+
+      calcDisplay.textContent = displayedNum + ".";
     }
 
     if (
-      action === 'add' ||
-      action === 'subtract' ||
-      action === 'multiply' ||
-      action === 'divide'
+      action === "add" ||
+      action === "subtract" ||
+      action === "multiply" ||
+      action === "divide"
     ) {
-      console.log('operation key');
+      calculator.dataset.previousKeyType = "operator";
+
+      key.classList.add("is-depressed");
     }
 
-    if (action === 'decimal') {
-      console.log('decimal key');
+    if (action === "clear") {
+      calculator.dataset.previousKeyType = "clear";
+      console.log("clear key");
     }
 
-    if (action === 'clear') {
-      console.log('clear key');
+    if (action === "allClear") {
+      console.log("All clear key");
     }
 
-    if (action === 'allClear') {
-      console.log('All clear key');
-    }
+    if (action === "equal") {
+      calculator.dataset.previousKeyType = "equal";
 
-    if (action === 'equal') {
-      console.log('equals key');
+      const secondValue = displayedNum;
     }
   }
 });
 
-//////////////////////////
+const calculate = (n1, operator, n2) => {
+  let result = "";
+
+  if (operator === "add") {
+    result = parseFloat(n1) + parseFloat(n2);
+  } else if (operator === "subtract") {
+    result = parseFloat(n1) - parseFloat(n2);
+  } else if (operator === "multiply") {
+    result = parseFloat(n1) * parseFloat(n2);
+  } else if (operator === "divide") {
+    result = parseFloat(n1) / parseFloat(n2);
+  }
+
+  return result;
+};
+
+/// ///////////////////////
 // My original functionality
-//////////////////////////
+/// ///////////////////////
 // // Number button functionality
 // numButtons.forEach(function(button) {
 //   button.addEventListener('click', function() {
