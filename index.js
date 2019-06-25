@@ -1,15 +1,15 @@
-const calculator = document.querySelector(".calculator");
-const calcDisplay = document.querySelector(".calc__display");
-let tempCalcSave = "";
-let calculationSave = "";
-const keypad = document.querySelector(".calc__keypad");
-const numButtons = Array.from(keypad.querySelectorAll(".num-button"));
-const opButtons = keypad.querySelectorAll(".op-button");
-const clearButton = keypad.querySelector(".clear-button");
-const allClearButton = keypad.querySelector(".all-clear-button");
+const calculator = document.querySelector('.calculator');
+const calcDisplay = document.querySelector('.calc__display');
+let tempCalcSave = '';
+let calculationSave = '';
+const keypad = document.querySelector('.calc__keypad');
+const numButtons = Array.from(keypad.querySelectorAll('.num-button'));
+const opButtons = keypad.querySelectorAll('.op-button');
+const clearButton = keypad.querySelector('.clear-button');
+const allClearButton = keypad.querySelector('.all-clear-button');
 
-keypad.addEventListener("click", e => {
-  if (e.target.closest("button")) {
+keypad.addEventListener('click', e => {
+  if (e.target.closest('button')) {
     const key = e.target;
     const action = key.dataset.operation;
     const keyContent = key.textContent;
@@ -17,63 +17,73 @@ keypad.addEventListener("click", e => {
     const previousKeyType = calculator.dataset.previousKeyType;
 
     Array.from(key.parentNode.children).forEach(k =>
-      k.classList.remove("is-depressed")
+      k.classList.remove('is-depressed')
     );
 
     if (!action) {
-      calculator.dataset.previousKeyType = "number";
+      calculator.dataset.previousKeyType = 'number';
 
-      if (displayedNum === "0" || previousKeyType === "operator") {
+      if (displayedNum === '0' || previousKeyType === 'operator') {
         calcDisplay.textContent = keyContent;
       } else {
         calcDisplay.textContent = displayedNum + keyContent;
       }
     }
 
-    if (action === "decimal") {
-      calculator.dataset.previousKeyType = "decimal";
+    if (action === 'decimal') {
+      calculator.dataset.previousKeyType = 'decimal';
 
-      calcDisplay.textContent = displayedNum + ".";
+      calcDisplay.textContent = displayedNum + '.';
     }
 
     if (
-      action === "add" ||
-      action === "subtract" ||
-      action === "multiply" ||
-      action === "divide"
+      action === 'add' ||
+      action === 'subtract' ||
+      action === 'multiply' ||
+      action === 'divide'
     ) {
-      calculator.dataset.previousKeyType = "operator";
+      calculator.dataset.previousKeyType = 'operator';
 
-      key.classList.add("is-depressed");
+      key.classList.add('is-depressed');
     }
 
-    if (action === "clear") {
-      calculator.dataset.previousKeyType = "clear";
-      console.log("clear key");
-    }
-
-    if (action === "allClear") {
-      console.log("All clear key");
-    }
-
-    if (action === "equal") {
-      calculator.dataset.previousKeyType = "equal";
-
+    if (action === 'equal') {
+      const firstValue = calculator.dataset.firstValue;
+      const operator = calculator.dataset.operator;
       const secondValue = displayedNum;
+
+      calculator.dataset.previousKeyType = 'equal';
+
+      displayedNum.textContent = calculate(firstValue, operator, secondValue);
+    }
+
+    if (action !== 'clear') {
+      clearButton.textContent = 'CE';
+    }
+
+    if (action === 'clear') {
+      if (key.textContent === 'AC') {
+        calculator.dataset.firstValue = '';
+        calculator.dataset.operator = '';
+      }
+
+      calcDisplay.textContent = '0';
+      key.textContent = 'AC';
+      calculator.dataset.previousKeyType = 'clear';
     }
   }
 });
 
 const calculate = (n1, operator, n2) => {
-  let result = "";
+  let result = '';
 
-  if (operator === "add") {
+  if (operator === 'add') {
     result = parseFloat(n1) + parseFloat(n2);
-  } else if (operator === "subtract") {
+  } else if (operator === 'subtract') {
     result = parseFloat(n1) - parseFloat(n2);
-  } else if (operator === "multiply") {
+  } else if (operator === 'multiply') {
     result = parseFloat(n1) * parseFloat(n2);
-  } else if (operator === "divide") {
+  } else if (operator === 'divide') {
     result = parseFloat(n1) / parseFloat(n2);
   }
 
