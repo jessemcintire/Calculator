@@ -110,76 +110,11 @@ keypad.addEventListener("click", e => {
 });
 
 const calculate = (n1, operator, n2) => {
-  let result = "";
+  const firstNum = parseFloat(n1);
+  const secondNum = parseFloat(n2);
 
-  if (operator === "add") {
-    result = parseFloat(n1) + parseFloat(n2);
-  } else if (operator === "subtract") {
-    result = parseFloat(n1) - parseFloat(n2);
-  } else if (operator === "multiply") {
-    result = parseFloat(n1) * parseFloat(n2);
-  } else if (operator === "divide") {
-    result = parseFloat(n1) / parseFloat(n2);
-  }
-
-  return result;
+  if (operator === "add") return firstNum + secondNum;
+  if (operator === "subtract") return firstNum - secondNum;
+  if (operator === "multiply") return firstNum * secondNum;
+  if (operator === "divide") return firstNum / secondNum;
 };
-
-/// ///////////////////////
-// My original functionality
-/// ///////////////////////
-// // Number button functionality
-// numButtons.forEach(function(button) {
-//   button.addEventListener('click', function() {
-//     // Update calculator display
-//     calcDisplay.textContent += this.getAttribute('data-value');
-//     // Update temporary calculator save variable
-//     tempCalcSave += this.getAttribute('data-value');
-//     console.log(tempCalcSave);
-//     //
-//   });
-// });
-
-// // Operation button functionality
-// opButtons.forEach(function(button) {
-//   button.addEventListener('click', function() {
-//     // Save current display number to calculation save
-//     if (calculationSave == '') {
-//       calculationSave = tempCalcSave;
-//     }
-//     console.log(calculationSave);
-//     // Clear temporary calculation save variable
-//     tempCalcSave = '';
-//     // Add operation to calculation save
-//     opText = this.getAttribute('data-operation');
-//     calculationSave += opText;
-//     // Clear display
-//     clearDisplay();
-//   });
-// });
-
-// // Clear button functionality
-// clearButton.addEventListener('click', _ => {
-//   // Clear display
-//   clearDisplay();
-// });
-
-// allClearButton.addEventListener('click', _ => {
-//   // Clear display
-//   clearDisplay();
-//   // Clear calculation save variable
-//   clearCalcSave();
-// });
-
-// function clearDisplay() {
-//   calcDisplay.textContent = '';
-// }
-
-// function clearCalcSave() {
-//   calculationSave = '';
-// }
-
-// const printButton = keypad.querySelector('.printButton');
-// printButton.addEventListener('click', () => {
-//   console.log(calculationSave);
-// });
