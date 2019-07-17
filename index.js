@@ -21,7 +21,11 @@ keypad.addEventListener("click", e => {
     );
 
     if (!action) {
-      if (displayedNum === "0" || previousKeyType === "operator") {
+      if (
+        displayedNum === "0" ||
+        previousKeyType === "operator" ||
+        previousKeyType === "equal"
+      ) {
         calcDisplay.textContent = keyContent;
       } else {
         calcDisplay.textContent = displayedNum + keyContent;
@@ -31,7 +35,7 @@ keypad.addEventListener("click", e => {
     }
 
     if (action === "decimal") {
-      if (previousKeyType === "operator") {
+      if (previousKeyType === "operator" || previousKeyType === "equal") {
         calcDisplay.textContent = "0.";
       } else if (!displayedNum.includes(".")) {
         calcDisplay.textContent = displayedNum + ".";
@@ -50,10 +54,15 @@ keypad.addEventListener("click", e => {
       const operator = calculator.dataset.operator;
       const secondValue = displayedNum;
 
-      if (firstValue && operator && previousKeyType !== "operator") {
+      if (
+        firstValue &&
+        operator &&
+        previousKeyType !== "operator" &&
+        previousKeyType !== "calculate"
+      ) {
         const calcValue = calculate(firstValue, operator, secondValue);
-        calcDisplay.textContent = calcValue;
 
+        calcDisplay.textContent = calcValue;
         calculator.dataset.firstValue = calcValue;
       } else {
         calculator.dataset.firstValue = displayedNum;
@@ -65,13 +74,21 @@ keypad.addEventListener("click", e => {
     }
 
     if (action === "equal") {
-      const firstValue = calculator.dataset.firstValue;
+      let firstValue = calculator.dataset.firstValue;
       const operator = calculator.dataset.operator;
-      const secondValue = displayedNum;
+      let secondValue = displayedNum;
 
+      if (firstValue) {
+        if (previousKeyType === "equal") {
+          firstValue = displayedNum;
+          secondValue = calculator.dataset.modValue;
+        }
+
+        calcDisplay.textContent = calculate(firstValue, operator, secondValue);
+      }
+
+      calculator.dataset.modValue = secondValue;
       calculator.dataset.previousKeyType = "equal";
-
-      calcDisplay.textContent = calculate(firstValue, operator, secondValue);
     }
 
     if (action !== "clear") {
@@ -81,6 +98,7 @@ keypad.addEventListener("click", e => {
     if (action === "clear") {
       if (key.textContent === "AC") {
         calculator.dataset.firstValue = "";
+        calculator.dataset.modValue = "";
         calculator.dataset.operator = "";
       }
 
