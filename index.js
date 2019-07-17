@@ -1,15 +1,15 @@
-const calculator = document.querySelector('.calculator');
-const calcDisplay = document.querySelector('.calc__display');
-let tempCalcSave = '';
-let calculationSave = '';
-const keypad = document.querySelector('.calc__keypad');
-const numButtons = Array.from(keypad.querySelectorAll('.num-button'));
-const opButtons = keypad.querySelectorAll('.op-button');
-const clearButton = keypad.querySelector('.clear-button');
-const allClearButton = keypad.querySelector('.all-clear-button');
+const calculator = document.querySelector(".calculator");
+const calcDisplay = document.querySelector(".calc__display");
+let tempCalcSave = "";
+let calculationSave = "";
+const keypad = document.querySelector(".calc__keypad");
+const numButtons = Array.from(keypad.querySelectorAll(".num-button"));
+const opButtons = keypad.querySelectorAll(".op-button");
+const clearButton = keypad.querySelector(".clear-button");
+const allClearButton = keypad.querySelector(".all-clear-button");
 
-keypad.addEventListener('click', e => {
-  if (e.target.closest('button')) {
+keypad.addEventListener("click", e => {
+  if (e.target.closest("button")) {
     const key = e.target;
     const action = key.dataset.operation;
     const keyContent = key.textContent;
@@ -17,73 +17,90 @@ keypad.addEventListener('click', e => {
     const previousKeyType = calculator.dataset.previousKeyType;
 
     Array.from(key.parentNode.children).forEach(k =>
-      k.classList.remove('is-depressed')
+      k.classList.remove("is-depressed")
     );
 
     if (!action) {
-      calculator.dataset.previousKeyType = 'number';
-
-      if (displayedNum === '0' || previousKeyType === 'operator') {
+      if (displayedNum === "0" || previousKeyType === "operator") {
         calcDisplay.textContent = keyContent;
       } else {
         calcDisplay.textContent = displayedNum + keyContent;
       }
+
+      calculator.dataset.previousKeyType = "number";
     }
 
-    if (action === 'decimal') {
-      calculator.dataset.previousKeyType = 'decimal';
+    if (action === "decimal") {
+      if (previousKeyType === "operator") {
+        calcDisplay.textContent = "0.";
+      } else if (!displayedNum.includes(".")) {
+        calcDisplay.textContent = displayedNum + ".";
+      }
 
-      calcDisplay.textContent = displayedNum + '.';
+      calculator.dataset.previousKeyType = "decimal";
     }
 
     if (
-      action === 'add' ||
-      action === 'subtract' ||
-      action === 'multiply' ||
-      action === 'divide'
+      action === "add" ||
+      action === "subtract" ||
+      action === "multiply" ||
+      action === "divide"
     ) {
-      calculator.dataset.previousKeyType = 'operator';
-
-      key.classList.add('is-depressed');
-    }
-
-    if (action === 'equal') {
       const firstValue = calculator.dataset.firstValue;
       const operator = calculator.dataset.operator;
       const secondValue = displayedNum;
 
-      calculator.dataset.previousKeyType = 'equal';
+      if (firstValue && operator && previousKeyType !== "operator") {
+        const calcValue = calculate(firstValue, operator, secondValue);
+        calcDisplay.textContent = calcValue;
 
-      displayedNum.textContent = calculate(firstValue, operator, secondValue);
-    }
-
-    if (action !== 'clear') {
-      clearButton.textContent = 'CE';
-    }
-
-    if (action === 'clear') {
-      if (key.textContent === 'AC') {
-        calculator.dataset.firstValue = '';
-        calculator.dataset.operator = '';
+        calculator.dataset.firstValue = calcValue;
+      } else {
+        calculator.dataset.firstValue = displayedNum;
       }
 
-      calcDisplay.textContent = '0';
-      key.textContent = 'AC';
-      calculator.dataset.previousKeyType = 'clear';
+      key.classList.add("is-depressed");
+      calculator.dataset.previousKeyType = "operator";
+      calculator.dataset.operator = action;
+    }
+
+    if (action === "equal") {
+      const firstValue = calculator.dataset.firstValue;
+      const operator = calculator.dataset.operator;
+      const secondValue = displayedNum;
+
+      calculator.dataset.previousKeyType = "equal";
+
+      calcDisplay.textContent = calculate(firstValue, operator, secondValue);
+    }
+
+    if (action !== "clear") {
+      clearButton.textContent = "CE";
+    }
+
+    if (action === "clear") {
+      if (key.textContent === "AC") {
+        calculator.dataset.firstValue = "";
+        calculator.dataset.operator = "";
+      }
+
+      calcDisplay.textContent = "0";
+      key.textContent = "AC";
+      calculator.dataset.previousKeyType = "clear";
     }
   }
 });
 
 const calculate = (n1, operator, n2) => {
-  let result = '';
+  let result = "";
 
-  if (operator === 'add') {
+  if (operator === "add") {
     result = parseFloat(n1) + parseFloat(n2);
-  } else if (operator === 'subtract') {
+  } else if (operator === "subtract") {
     result = parseFloat(n1) - parseFloat(n2);
-  } else if (operator === 'multiply') {
+  } else if (operator === "multiply") {
     result = parseFloat(n1) * parseFloat(n2);
-  } else if (operator === 'divide') {
+  } else if (operator === "divide") {
     result = parseFloat(n1) / parseFloat(n2);
   }
 
