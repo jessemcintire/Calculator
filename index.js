@@ -10,102 +10,68 @@ const allClearButton = keypad.querySelector(".all-clear-button");
 
 keypad.addEventListener("click", e => {
   if (e.target.closest("button")) {
-    const key = e.target;
-    const action = key.dataset.operation;
-    const keyContent = key.textContent;
     const displayedNum = calcDisplay.textContent;
-    const previousKeyType = calculator.dataset.previousKeyType;
+    const resultString = createResultString(
+      e.target,
+      displayedNum,
+      calculator.dataset
+    );
 
     Array.from(key.parentNode.children).forEach(k =>
       k.classList.remove("is-depressed")
     );
 
-    if (!action) {
-      if (
-        displayedNum === "0" ||
-        previousKeyType === "operator" ||
-        previousKeyType === "equal"
-      ) {
-        calcDisplay.textContent = keyContent;
-      } else {
-        calcDisplay.textContent = displayedNum + keyContent;
+    const createResultString = (key, displayedNum, state) => {
+      const keyContent = key.textContent;
+      const { action } = key.dataset;
+      const { firstValue, modValue, operator, previousKeyType } = state;
+      const keyType = getKeyType(key);
+
+      if (keyType === "number") {
+        return displayedNum === "0" ||
+          previousKeyType === "operator" ||
+          previousKeyType === "equal"
+          ? keyContent
+          : displayedNum + keyContent;
       }
 
-      calculator.dataset.previousKeyType = "number";
-    }
-
-    if (action === "decimal") {
-      if (previousKeyType === "operator" || previousKeyType === "equal") {
-        calcDisplay.textContent = "0.";
-      } else if (!displayedNum.includes(".")) {
-        calcDisplay.textContent = displayedNum + ".";
+      if (keyType === "decimal") {
+        if (previousKeyType === "operator" || previousKeyType === "equal")
+          return "0.";
+        if (!displayedNum.includes(".")) return displayedNum + ".";
+        return displayedNum;
       }
 
-      calculator.dataset.previousKeyType = "decimal";
-    }
+      if (keyType === "operator") {
+        const firstValue = calculator.dataset.firstValue;
+        const operator = calculator.dataset.operator;
 
-    if (
-      action === "add" ||
-      action === "subtract" ||
-      action === "multiply" ||
-      action === "divide"
-    ) {
-      const firstValue = calculator.dataset.firstValue;
-      const operator = calculator.dataset.operator;
-      const secondValue = displayedNum;
-
-      if (
-        firstValue &&
-        operator &&
-        previousKeyType !== "operator" &&
-        previousKeyType !== "calculate"
-      ) {
-        const calcValue = calculate(firstValue, operator, secondValue);
-
-        calcDisplay.textContent = calcValue;
-        calculator.dataset.firstValue = calcValue;
-      } else {
-        calculator.dataset.firstValue = displayedNum;
+        return firstValue &&
+          operator &&
+          previousKeyType !== "operator" &&
+          previousKeyType !== "calculate"
+          ? calculate(firstValue, operator, displayedNum)
+          : displayedNum;
       }
 
-      key.classList.add("is-depressed");
-      calculator.dataset.previousKeyType = "operator";
-      calculator.dataset.operator = action;
-    }
+      if (keyType === "equal") {
+        let firstValue = calculator.dataset.firstValue;
+        const operator = calculator.dataset.operator;
+        const modValue = calculator.dataset.modValue;
 
-    if (action === "equal") {
-      let firstValue = calculator.dataset.firstValue;
-      const operator = calculator.dataset.operator;
-      let secondValue = displayedNum;
-
-      if (firstValue) {
-        if (previousKeyType === "equal") {
-          firstValue = displayedNum;
-          secondValue = calculator.dataset.modValue;
-        }
-
-        calcDisplay.textContent = calculate(firstValue, operator, secondValue);
+        return firstValue
+          ? previousKeyType === "equal"
+            ? calculate(firstValue, operator, modValue)
+            : calculate(firstValue, operator, diplayedNum)
+          : displayedNum;
       }
 
-      calculator.dataset.modValue = secondValue;
-      calculator.dataset.previousKeyType = "equal";
-    }
-
-    if (action !== "clear") {
-      clearButton.textContent = "CE";
-    }
-
-    if (action === "clear") {
-      if (key.textContent === "AC") {
-        calculator.dataset.firstValue = "";
-        calculator.dataset.modValue = "";
-        calculator.dataset.operator = "";
+      if (keyType !== "clear") {
+        clearButton.textContent = "CE";
       }
 
-      calcDisplay.textContent = "0";
-      key.textContent = "AC";
-      calculator.dataset.previousKeyType = "clear";
-    }
+      if (keyType === "clear") return "0";
+    };
   }
 });
 
@@ -117,4 +83,19 @@ const calculate = (n1, operator, n2) => {
   if (operator === "subtract") return firstNum - secondNum;
   if (operator === "multiply") return firstNum * secondNum;
   if (operator === "divide") return firstNum / secondNum;
+};
+
+const getKeyType = key => {
+  const { action } = key.dataset;
+
+  if (!action) return "number";
+
+  if (
+    action === "add" ||
+    action === "subtract" ||
+    action === "multiply" ||
+    action === "divide"
+  )
+    return "operator";
+  return action;
 };
